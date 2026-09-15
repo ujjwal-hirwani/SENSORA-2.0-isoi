@@ -16,6 +16,9 @@ const teamRoutes = require("./routes/teamRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const queryRoutes = require("./routes/queryRoutes");
 
+const { protect } = require("./middleware/authMiddleware");
+const { isAdmin } = require("./middleware/adminMiddleware");
+
 const app = express();
 
 // Connect MongoDB & Seed Admin
@@ -35,7 +38,8 @@ app.use("/api/teams", teamRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/queries", queryRoutes);
 
-app.get('/api/db/info', async (req, res) => {
+// Debug endpoint — lists DB/collection names, so it must never be public
+app.get('/api/db/info', protect, isAdmin, async (req, res) => {
   try {
     const admin = mongoose.connection.db.admin();
     const { databases } = await admin.listDatabases();
